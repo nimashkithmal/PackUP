@@ -1,0 +1,41 @@
+# Values come from a .env file next to this file (or your shell). Defaults are for local demos only.
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: packup
+      MYSQL_USER: packup
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-packup}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-packup}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - packup_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: mysql+pymysql://packup:${MYSQL_PASSWORD:-packup}@mysql:3306/packup
+      AUTH_MODE: ${AUTH_MODE:-local}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-change-me}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+      RETRAIN_INTERVAL_HOURS: ${RETRAIN_INTERVAL_HOURS:-24}
+    ports:
+      - "8000:8000"
+    volumes:
+      - packup_models:/app/ml/artifacts
+
+volumes:
+  packup_mysql:
+  packup_models:
