@@ -13,12 +13,14 @@ void main() {
     await auth.restore();
     await tester.pumpWidget(PackUpApp(auth: auth));
 
+    await tester.ensureVisible(find.text("Sign in"));
     await tester.tap(find.text("Sign in"));
     await tester.pump();
     expect(find.text("Enter your email."), findsOneWidget);
 
     await tester.enterText(find.widgetWithText(TextField, "Email"), "a@b.co");
     await tester.enterText(find.widgetWithText(TextField, "Password"), "123");
+    await tester.ensureVisible(find.text("Sign in"));
     await tester.tap(find.text("Sign in"));
     await tester.pump();
     expect(find.text("Password must be at least 6 characters."), findsOneWidget);

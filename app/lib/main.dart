@@ -6,6 +6,7 @@ import "firebase_options.dart";
 import "screens/home_screen.dart";
 import "screens/login_screen.dart";
 import "services/auth_service.dart";
+import "theme.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,9 @@ Future<void> main() async {
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
+/// Lets screens refresh when the user comes back to them.
+final routeObserver = RouteObserver<ModalRoute<void>>();
+
 class PackUpApp extends StatelessWidget {
   const PackUpApp({super.key, required this.auth});
   final AuthService auth;
@@ -34,11 +38,10 @@ class PackUpApp extends StatelessWidget {
     return MaterialApp(
       title: "PackUP",
       navigatorKey: navigatorKey,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0F6B4D)),
-        useMaterial3: true,
-        inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder()),
-      ),
+      navigatorObservers: [routeObserver],
+      debugShowCheckedModeBanner: false,
+      theme: buildTheme(Brightness.light),
+      darkTheme: buildTheme(Brightness.dark),
       home: auth.current == null ? LoginScreen(auth: auth) : HomeScreen(auth: auth),
     );
   }
