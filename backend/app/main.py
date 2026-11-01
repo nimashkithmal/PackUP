@@ -63,3 +63,13 @@ app.include_router(admin.router)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/")
+def home():
+    return {
+        "status": "success",
+        "message": "Welcome to PackUP Recommendation API",
+        "documentation": "/docs",
+        "health": "/health"
+    }
